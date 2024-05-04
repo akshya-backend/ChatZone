@@ -4,9 +4,30 @@ import { handle_friend_request, self_MessagePrint } from "./message-handler.js";
 // Get authentication token
 const token = document.getElementById("self-info").getAttribute("data");
 const peerId = document.getElementById("self-id").getAttribute("data-custom")
+export let peer;
 
-// create new instance of peer js 
-export const peer = await new Peer(peerId);
+// Function to initialize PeerJS connection
+function initializePeer(id) {
+    peer = new Peer(id);
+    peer.on('open', (id) => {console.log('My peer ID is: ' + id);});
+    peer.on('error', handlePeerError);
+}
+
+// Function to handle PeerJS connection errors
+ export function handlePeerError(error) {
+    showErrorNotification("Failed to establish WebSocket connection to PeerJS server");
+    console.error('WebSocket connection error:', error);
+    setTimeout(reconnectPeer, 2000);
+}
+
+// Function to reconnect PeerJS connection
+function reconnectPeer() {
+    console.log('Attempting to reconnect to PeerJS server...');
+    initializePeer(peerId); // Reinitialize PeerJS connection
+}
+
+// Initialize PeerJS connection
+initializePeer(peerId);
 
 // Establish Socket.io connection with authentication
 export const socket = io( { query: { token: token } });
@@ -20,24 +41,8 @@ socket.on('error', (data) => { showErrorNotification(data) });
 socket.on('message-response', (data) => self_MessagePrint(data))
 socket.on('message-from-friend', (data) => handle_friend_request(data))
 socket.on('blocked-response', (data) => { showErrorNotification(data) })
-socket.on('close-videocall',(message)=>{
-    const Ele= document.getElementById("videoEle")
-    if (Ele || typeof confirm === 'function') {
-         showErrorNotification(message)
-        setTimeout(() => {
-        window.location.reload() 
-
-    }, 1000);  
-    }
- 
-   });
-   socket.on("User-Already-In-Call",()=>{
-    showErrorNotification(" Already in Video with Someone ")
-    setTimeout(() => {
-        window.location.reload() 
- 
-    }, 1000);
-   })
+socket.on('close-videocall',(message)=>{CloseCall(message)});
+socket.on("User-Already-In-Call",()=>{AlreadyInCall() })
 
 // Function to send a message
 function sendMessage() {
@@ -105,11 +110,11 @@ fileInput.addEventListener('change', async () => {
         const lists=document.getElementById("chat-area")
         const message=`
         <div id="your-chat" class="your-chat">
-    <div class="loading-dot">
-        <img src="https://www.icegif.com/wp-content/uploads/2023/07/icegif-1263.gif" alt="Loading Animation" style="width: 250px; height: 200px; border-radius: 10px;">
-        <div class="loading-text" id="loading-text">Sending....</div>
-    </div>
-</div>
+          <div class="loading-dot">
+             <img src="https://www.icegif.com/wp-content/uploads/2023/07/icegif-1263.gif" alt="Loading Animation" style="width: 250px; height: 200px; border-radius: 10px;">
+               <div class="loading-text" id="loading-text">Sending....</div>
+          </div>
+        </div>
 
     `
         lists.insertAdjacentHTML('beforeend', message);
@@ -126,7 +131,7 @@ fileInput.addEventListener('change', async () => {
 
 
 function handleOnline(id){
-    const findFriend=document.querySelector(`[data="${id}"]`)
+ const findFriend=document.querySelector(`[data="${id}"]`)
  if (findFriend) {
     const getElement=findFriend?.querySelector(".friends-photo");
      const getstatus=findFriend?.querySelector("#onlinestatus");
@@ -144,4 +149,23 @@ function handleOffline(id){
 
 }}
 
+ function CloseCall(message) {
+    const Ele= document.getElementById("videoCalling")
+    const check2=document.getElementById("call-popup")
+
+    if (Ele || check2) {
+         showErrorNotification(message)
+        setTimeout(() => {
+        window.location.reload() 
+
+    }, 1000);  
+    }
+ }
+
+ function AlreadyInCall(){
+    showErrorNotification(" Already in Video with Someone ")
+    setTimeout(() => {
+        window.location.reload() 
  
+    }, 1000);
+ }
