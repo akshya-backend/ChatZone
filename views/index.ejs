@@ -1,0 +1,213 @@
+<!-- Include Font Awesome CSS -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Chat App </title>
+  <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.0.3/dist/index.min.js"></script>
+  <link rel="stylesheet" href="/bootstrap3.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/chat.css">
+
+</head>
+<body id="body">
+  <div id="app" class="app">
+    <!-- LEFT SECTION -->
+    <section id="main-left" class="main-left">
+      <!-- header -->
+      <div id="header-left" class="header-left">
+        <input id="friend-input" type="text" style="width: 300px; max-height:40px; padding: 10px; margin-right: 10px; border: none; border-radius: 5px; outline: none;" placeholder="Enter Friend ID">
+        <button id="addFriend" style="padding: 10px 20px;max-height:40px;background-color: #00b894;color: #fff;border: none;border-radius: 5px;cursor: pointer;transition: background-color 0.3s ease;">Add</button>
+      </div>
+      <!-- chat list -->
+      <div id="chat-list" class="chat-list">
+        <% user.friends.forEach((item) => { %>
+          
+          <div id="friends" data="<%=item.friendId?.userId %>" class="friends">
+            <!-- photo -->
+            <div style="position: relative; display: flex; align-items: center;">
+
+            <% if (status.has(item.friendId.userId)) { %>
+              <div style="border: 3px solid limegreen; display: inline-block;" class="profile friends-photo">
+          <% } else { %>
+                <div style="border: 3px solid red; display: inline-block;" class="profile friends-photo">
+          <% } %>             
+                 <img src="<%= item.friendId?.profilePicture %>" alt="">
+            </div>
+               <%- status.has(item.friendId.userId) ? `<span id="onlinestatus" style="position: absolute; bottom: 23px; left: 33px; width: 15px; height: 15px; background-color: limegreen; border-radius: 50%; border: 3px solid white;"></span>`
+               :`<span id="onlinestatus" style="position: absolute; bottom: 23px; left: 33px; width: 15px; height: 15px; background-color: red; border-radius: 50%; border: 3px solid white;"></span>` %>
+           </div>
+            <div class="friends-credent">
+              <!-- name -->
+              <span class="friends-name"><%= item.friendId?.name %></span>
+              <!-- last message -->
+              <span class="friends-message"><%= item.conversationId?.messages[item.conversationId.messages.length - 1]?.content %></span>
+            </div>
+            <!-- notification badge -->
+            <% const participant = item.conversationId?.participants.find(e => e.user.toString() === user._id.toString())  %>
+
+            <span class="badge notif-badge"><%= participant?.pending_message == 0 ? "" : participant.pending_message %></span>
+            
+          </div>
+        <% }) %>
+      </div>
+      
+      <!-- self-profile -->
+      <div data="<%= encode %>" id="self-info" class="self-info">
+        <!-- photo -->
+        <div class="profile your-photo">
+          <img src="<%=user.profilePicture %>" alt="">
+        </div>
+        <!-- name -->
+        <h4  data-custom="<%= user.userId %>" id="self-id"  class="name your-name"><%= user.name %></h4>
+        <!-- setting btn -->
+        <div class="dropdown">
+          <span id="setting-dropdown" class="glyphicon glyphicon-cog option-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></span>
+          <div class="dropdown-menu" aria-labelledby="setting-dropdown">
+            <a class="dropdown-item" href="/api/Chat-Zone/User/profile-page" ><i class="fas fa-user-alt"></i> My Profile</a>
+            <div id="logout" class="dropdown-item" ><i class="fas fa-door-open"></i> Logout</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SECTION -->
+      <!-- header -->
+      <% if (index) {  %>
+        <section id="mainContent" style="background-color: #dedede;">
+
+        <div class="containerMain">
+          <h1 class="headingMain">Welcome to ChatZone, <%= user.name %>!</h1>
+          <p class="subheadingMain">Connect & Converse with Friends!</p>
+          <button  id="indexAddFriend" class="add-friend-button">Add Friend</button>
+        </div>
+        </section>
+      <% } else {  %>  
+        <section id="main-right" class="main-right">
+
+        
+      <div id="header-right" class="header-right">
+        <!-- profile pict -->
+        <div id="header-img" class="profile header-img">
+          <img src="<%=friend.profilePicture %>" alt="">
+        </div>
+
+        <!-- name -->
+        <h4 data="<%=encodefriend  %>" id="friendId" class="name friend-name"><%= friend.name  %></h4>
+
+        <!-- some btn -->
+        <div class="some-btn" style="display: flex;">
+          <span id="video-call" class="glyphicon glyphicon-facetime-video"></span>
+          
+        </div>
+      </div>
+
+      <!-- chat area -->
+      <div id="chat-area" class="chat-area">
+        <% message.messages.forEach((item) => { %>
+          <% if (item.sender._id.toString() === user._id.toString()) { %>
+            <div id="your-chat" class="your-chat">
+               <%- message_type( item.contentType, item.content) %>
+              <p class="chat-datetime"><%= formatTime(item.timestamp) %></p>
+            </div>
+          <% } else { %> 
+            <div id="friends-chat" class="friends-chat">
+              <div class="profile friends-chat-photo">
+                <img src="<%= item.sender.profilePicture  %>" alt="">
+              </div>
+              <div class="friends-chat-content">
+                <p class="friends-chat-name"><%= item.sender.name %></p>
+                <%- message_typeReceiver( item.contentType, item.content) %>
+                <h5 class="chat-datetime"><%= formatTime(item.timestamp) %></h5>
+              </div>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+      
+      <!-- typing area -->
+      <div id="typing-area" class="typing-area">
+        <!-- input form -->
+        <input id="type-area" class="type-area" autofocus="on" placeholder="Type something...">
+        <!-- attachment btn -->
+        <div class="attach-btn">
+          <span class="emoji-icon" id="emojiButton"></span>
+          <span class="glyphicon glyphicon-paperclip file-btn" id="file-select"></span>
+        </div>
+        <!-- send btn -->
+        <span id="send-btn" class="glyphicon glyphicon-send send-btn"></span>
+      </div>
+   <% } %> 
+    </section>
+  </div>
+     <script src="/siofu/client.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script type="module"  src="/script/index.js"> </script>
+    <script type="module"  src="/script/socket-handler.js"> </script>
+    <script type="module"  src="/script/message-handler.js"> </script>
+    <script type="module"  src="/script/videoCalling-handler.js"> </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/bootstrap3.3/js/bootstrap.min.js"></script>
+  
+    <%
+
+
+
+
+    
+    function formatTime(x) {
+   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+   const now = new Date(x);
+
+   const dayOfWeek = daysOfWeek[now.getDay()];
+   const month = months[now.getMonth()];
+   const date = now.getDate();
+   const hours = now.getHours() % 12 || 12; // Convert to 12-hour format
+   const minutes = ('0' + now.getMinutes()).slice(-2);
+   const ampm = now.getHours() >= 12 ? 'p.m' : 'a.m';
+
+   return `${dayOfWeek}, ${month} ${date} | ${hours}:${minutes} ${ampm}`;
+  }
+
+  function message_type(fulldata, message) {
+  const data=fulldata.split("/")
+   switch (data[0]) {
+   case "image":
+      return `<div><a href="${message}" download><img src="${message}" style="width: 250px; height: 200px; border-radius: 10px;"> </a></div>`;
+   case "audio":
+      return `<div><audio controls><source src="${message}" type="audio/mpeg">Your browser does not support the audio element.</audio><br></div>`;
+   case "video":
+      return `<div><video width="320" height="240" controls><source src="${message}" type="video/mp4">Your browser does not support the video tag.</video><br><a href="${message}" download>Download Video</a></div>`;
+   case "document":
+   return `<div class="your-chat-balloon"><a style="color:white" href="${message}" download>${data[1]}<span class="glyphicon glyphicon-download-alt" style="font-size: 20px; margin-left: 10px; color:white;"></span></a></div>`;
+   default:
+    const div=`<p class="your-chat-balloon">${message}</p>`
+      return div ;
+   }
+}
+function message_typeReceiver(fulldata, message) {
+  const data=fulldata.split("/")
+
+   switch (data[0]) {
+   case "image":
+      return `<div><a href="${message}" download><img src="${message}" style="width: 250px; height: 200px; border-radius: 10px;"> </a></div>`;
+   case "audio":
+      return `<div><audio controls><source src="${message}" type="audio/mpeg">Your browser does not support the audio element.</audio><br></div>`;
+   case "video":
+      return `<div><video width="320" height="240" controls><source src="${message}" type="video/mp4">Your browser does not support the video tag.</video><br><a href="${message}" download>Download Video</a></div>`;
+   case "document":
+   return `<div class="friends-chat-balloon"><a style="color:black" href="${message}" download>${data[1]}<span class="glyphicon glyphicon-download-alt" style="font-size: 20px; margin-left: 10px; color:black;"></span></a></div>`;
+
+   default:
+    const div=`<p class="friends-chat-balloon">${message}</p>`
+      return div ;
+   }
+}
+    %>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Change</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333333;
+        }
+
+        input[type="password"] {
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #5cb85c;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Change Password</h2>
+        <form action="/api/Chat-Zone/security/setNewPin" method="POST">
+            <label for="password">New Pin:</label>
+            <input type="password" maxlength="4" minlength="4" id="password" name="newPin" required>
+            <input type="hidden" name="email"  value="<%=email  %>">
+            <label for="confirm-password">Confirm Pin</label>
+            <input type="password" maxlength="4" minlength="4" id="confirm-password" name="confirmPassword" required>
+            <button type="submit">Change Pin</button>
+        </form>
+    </div>
+    <script>document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+    
+        form.addEventListener('submit', function (event) {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                event.preventDefault(); // Prevent form submission
+                showErrorNotification('Pins do not match');
+            } else if (!isValidPin(passwordInput.value) || !isValidPin(confirmPasswordInput.value)) {
+                event.preventDefault(); // Prevent form submission
+                showErrorNotification('Pin must be Numbers');
+            }
+        });
+    });
+    
+    function isValidPin(pinValue) {
+        return /^\d{4}$/.test(pinValue);
+    }
+    
+    function showErrorNotification(message) {
+        var notification = document.createElement('div');
+        notification.id = 'notification';
+        notification.style.cssText = 'z-index:1; height:fit-content;position: fixed; text-align: center; max-width: 350px; top: -100px; left: 50%; transform: translateX(-50%); background-color: #f44336; color: white; padding: 10px; border-radius: 10px;  transition: top 0.5s ease-in-out; display: flex; align-items: center; justify-content: flex-start;';
+    
+        var avatar = document.createElement('div');
+        avatar.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; background-color: white; color: #f44336; font-size: 24px; display: flex; align-items: center; justify-content: center; margin-right: 20px;';
+        avatar.innerHTML = '!';
+    
+        var messageText = document.createElement('div');
+        messageText.textContent = message;
+        messageText.style.flex = '1';
+    
+        notification.appendChild(avatar);
+        notification.appendChild(messageText);
+    
+        document.body.appendChild(notification);
+    
+        setTimeout(function () {
+            notification.style.top = '15px'; // Slide in from the top
+            setTimeout(function () {
+                notification.style.top = '-100px'; // Slide out from the top
+                setTimeout(function () {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }, 100);
+    }
+    </script>
+</body>
+</html>
+       

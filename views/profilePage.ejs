@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <link rel="stylesheet" href="/css/profile.css">
+
+    
+</head>
+
+<body style="background-color: #031426;">
+    <div class="container light-style flex-grow-1 container-p-y">
+        <h4 class="font-weight-bold py-3 mb-4">Account settings</h4>
+        <div class="card overflow-hidden">
+            <div class="row no-gutters row-bordered row-border-light">
+                <div style="background-color: #031426; border-right:1px solid white" class="col-md-3 pt-0">
+                    <div  class="list-group list-group-flush account-settings-links">
+                        <a  class="list-group-item list-group-item-action active" data-toggle="list" href="#account-general">General</a>
+                      <% if (self_visit) { %>
+                        <a  class="list-group-item list-group-item-action" data-toggle="list" href="#account-change-password">Change password</a>
+                        <a  class="list-group-item list-group-item-action" data-toggle="list" href="#friends">Friends</a>
+                     <% } %>  
+                        <a  class="list-group-item list-group-item-action " data-toggle="list" href="#account-info">Info</a>
+                        <a  class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Social links</a>
+          
+
+                    </div>
+                </div>
+                <div style="background-color: #031426;" class="col-md-9">
+                    <div class="tab-content">
+                        <div class="tab-pane fade active show " id="account-general">
+                            <div class="card-body media align-items-center">
+                                <div class="loading-screen" id="loadingScreen">
+                                    <div class="spinner"></div>
+                                    <div class="loading-text">Uploading...</div>
+                                </div>
+                            
+                                <img id="profilePic" src="<%= user.profilePicture %>" alt="" class="d-block ui-w-80" style="height: 220px; width: 230px; border-radius: 50%; border: 5px solid white;">
+                                <div class="media-body ml-4">
+                                    <% if (self_visit) { %>
+
+                                    <button type="button" id="change-pic-btn" style="margin-bottom: 20px; margin-right: 20px;" class="btn btn-primary">Change Profile Pic</button>&nbsp;
+                                    <div class="text-light small mt-1">Allowed JPG or PNG.</div>
+
+
+                                    <% } %>
+                                </div>
+                            </div>
+                            <hr class="border-light m-0">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">User-Id</label>
+                                    <div style="display: flex; align-items: center;">
+                                    <input type="text"  id="userid" class="form-control mb-1" value="<%=user.userId  %>" disabled>
+                                    <div id="userIdBtn" style=" height: 38px;margin-left: 10px;" class="input-group-append">
+                                        <span class="input-group-text" id="copyUserIdBtn">
+                                            <i class="far fa-copy"></i>
+                                        </span>
+                                    </div>
+                                    </div>
+
+
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label id="email" class="form-label">Email</label>
+                                    <input type="text" class="form-control mb-1" value="<%=user.email  %>" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="account-change-password">
+                            <div class="card-body pb-2">
+                                <div class="form-group">
+                                    <label class="form-label">Current Pin</label>
+                                    <input id="currentPin" type="password"  minlength="4" maxlength="4" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">New Pin</label>
+                                    <input  id="newPin" type="password" maxlength="4" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Repeat new Pin</label>
+                                    <input id="confirmPin" type="password" maxlength="4" class="form-control">
+                                </div>
+                            </div>
+                            <div class="text-right mt-3">
+                                <button id="changePassword" type="button" style="margin-bottom: 20px; margin-right: 20px;" class="btn btn-primary">Save changes</button>&nbsp;
+                            </div>
+                            
+                        </div>
+                        <div class="tab-pane fade " id="account-info">
+                            <div class="card-body pb-2">
+                                <div class="form-group">
+                                    <label class="form-label">Bio</label>
+                                    <textarea rows="4" cols="50" id="bioInput" maxlength="200" class="form-control"><%= user.bio %></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Name</label>
+                                    <input id="nameInput" type="text" class="form-control" value="<%=user.name  %>" name="name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Birthday</label>
+                                    <input type="date" id="birthdayInput" class="form-control" value="<%= user.DOB %>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" id="addressInput" maxlength="100" class="form-control" value="<%= user.address %>">
+                                </div>
+                            </div>
+                            <hr class="border-light m-0">
+                            <div class="card-body pb-2">
+                                <h6 class="mb-4">Contacts</h6>
+                                <div class="form-group">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" id="phoneInput" maxlength="10" class="form-control" value="<%= user.phone  %>">
+                                </div>
+                            </div>
+                            <div class="text-right mt-3">
+                                <% if (self_visit) { %>
+
+                                <button id="bioChanges" type="button"  style="margin-bottom: 20px; margin-right: 20px;" class="btn btn-primary">Save changes</button>&nbsp;
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="account-social-links">
+                            <div class="card-body pb-2">
+                                <div class="form-group">
+                                    <label class="form-label">Twitter</label>
+                                    <input type="text"  id="twitterInput" class="form-control" value="<%=user.links.twitter  %>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Facebook</label>
+                                    <input type="text"  id="facebookInput" class="form-control" value="<%=user.links.facebook  %>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">GitHub</label>
+                                    <input type="text"  id="githubInput" class="form-control" value="<%=user.links.github %>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">LinkedIn</label>
+                                    <input type="text"  id="linkedinInput" class="form-control" value="<%=user.links.linkedin  %>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Instagram</label>
+                                    <input type="text" id="InstagramInput" class="form-control" value="<%=user.links.instagram  %>">
+                                </div>
+                            </div>
+                            <div class="text-right mt-3">
+                                <% if (self_visit) { %>
+
+                                <button  id="link-btn" type="button" style="margin-bottom: 20px; margin-right: 20px;" class="btn btn-primary">Save changes</button>&nbsp;
+                            <% } %>
+                            </div>
+                        
+                        </div>
+                        <div class="tab-pane fade" id="friends">
+                           <% user.friends.forEach((e) => { %> 
+                           <div style="padding: 0; border-bottom:1px solid white;" class="card-body pb-2">
+                                <div style="margin: 0;" class="form-group">
+                                    <div class="friend-list">
+                                        <div class="friend" style="display: flex; justify-content: space-between;">
+                                            <div> 
+                                                <img src="<%= e.friendId.profilePicture  %>" alt="Friend 1" class="profile-image" >
+                                                      <span  id="parentfriend-name" style="margin-left: 20px;" class="status">
+                                                         <% if (e.blocked) { %>
+                                                               <%= e.friendId.name %> <span id="inlineblocked" style="color: white;background-color: red; border-radius: 10px; margin-left: 10px; padding: 5px;"> Blocked</span>
+                                                         <% } else { %>
+                                                                <%= e.friendId.name %>
+                                                          <% } %></span>
+                                             </div>
+                                           
+                                            <div class="actions">
+                                                <button id="chatInit" data="<%= e.friendId.userId%>" class="btn btn-primary chat-btn">Chat</button>
+                                                <% if (e.blocked) { %>
+                                                 <button id="blocked" style="background-color:green; border-color: green;"  data="<%= e.friendId._id %>" class="btn btn-danger unfriend-btn">Unblock</button>
+
+                                               <%  } else {%>  
+                                                    <button id="blocked" style="background-color: red;" data="<%= e.friendId._id %>"  class="btn btn-danger unfriend-btn">block</button>
+ 
+                                               <% } %>
+                                                <button id="VisitProfile" data="<%= e.friendId._id %>" class="btn btn-info visit-btn">Visit Profile</button>
+                                           
+                                            </div>
+                                        </div>
+                                        <!-- Add more friends here -->
+                                    </div>
+                                </div>
+                                <!-- Add more friend groups here -->
+                            </div>
+                            <% }) %>
+                          
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="/script/profileScript.js"></script>
+    <% if (!self_visit) { %>
+        <!-- Add this script in your HTML file -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all input and textarea elements
+        const inputElements = document.querySelectorAll('input, textarea');
+
+        // Loop through each input and textarea element
+        inputElements.forEach(function(element) {
+            // Add event listener for mouseover
+            element.addEventListener('mouseover', function() {
+                this.disabled = true; // Disable the element when hovered over
+            });
+
+            // Add event listener for mouseout
+            element.addEventListener('mouseout', function() {
+                this.disabled = false; // Enable the element when mouse leaves
+            });
+        });
+    });
+</script>
+
+    <% } %>
+    
+</body>
+</html>

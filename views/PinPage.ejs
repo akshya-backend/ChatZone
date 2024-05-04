@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat-Zone</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/signup.css">
+</head>
+<body id="body">
+    <img class="wave" src="/images/wave.png">
+    <div class="container">
+        <div class="img"></div>
+        <div id="loginContent" class="login-content" style="opacity: 1;">
+            <form id="loginForm" action="/api/Chat-Zone/security/PinCheck" method="post" style="margin-top: -80px;display: flex;flex-direction: column;align-items: center;">  
+                <h2 style="margin-bottom:70px;margin-left: -40px; min-size: 400px;" class="title">Welcome <span style="color: #17a2b8;">Back</span></h2>
+                <div style="margin-left:-10px;" id="forgetPass">Enter Your App Pin</div>
+                <div id="allinputs" style="max-width: 400px; margin-bottom: 70px;" class="d-flex flex-row mt-5">
+                    <input id="input1" type="password" name="pass1" class="form-control" maxlength="1" autofocus="on" autocomplete="off" required>
+                    <input id="input2" type="password" name="pass2" maxlength="1" class="form-control" autocomplete="off" required>
+                    <input id="input3" type="password" name="pass3" maxlength="1" class="form-control" autocomplete="off" required>
+                    <input id="input4" type="password" name="pass4" maxlength="1" class="form-control" autocomplete="off" required>
+                </div>
+                <div id="forgetPass" class="forgetPin">Forget Password ?</div>
+                <button id="passCheck" style="max-width:270px" class="btn btn-primary" >
+                    <span id="spinnCircle" style="display: none; margin-right: 10px" class="spinner-border spinner-border-sm"></span>
+                    Verify
+                </button>	
+            </form>
+        </div>
+    </div>
+    <% if (typeof error !== 'undefined' && error) { %> 
+        <script>
+            function showErrorNotification(message) { 
+                var notification = document.createElement('div');
+                notification.id = 'notification';
+                notification.style.cssText = 'z-index:1; height:fit-content;position: fixed; text-align: center; max-width: 350px; top: -100px; left: 50%; transform: translateX(-50%); background-color: #f44336; color: white; padding: 10px; border-radius: 10px;  transition: top 0.5s ease-in-out; display: flex; align-items: center; justify-content: flex-start;';
+                
+                var avatar = document.createElement('div');
+                avatar.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; background-color: white; color: #f44336; font-size: 24px; display: flex; align-items: center; justify-content: center; margin-right: 20px;';
+                avatar.innerHTML = '!';
+                
+                var messageText = document.createElement('div');
+                messageText.textContent = message;
+                messageText.style.flex = '1';
+                
+                notification.appendChild(avatar);
+                notification.appendChild(messageText);
+                
+                document.body.appendChild(notification);
+        
+                setTimeout(function () {
+                    notification.style.top = '15px'; // Slide in from the top
+                    setTimeout(function () {
+                        notification.style.top = '-100px'; // Slide out from the top
+                        setTimeout(function () {
+                            notification.remove();
+                        }, 500);
+                    }, 3000);
+                }, 100);
+            }
+            showErrorNotification('<%= error %>'); // Call the function with error message
+        </script>
+    <% } %>
+    <script type="module" src="/script/PinPage-handler.js"></script>
+    </body>
+</html>
