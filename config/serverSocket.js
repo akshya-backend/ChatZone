@@ -8,12 +8,10 @@ const UPLOAD_DIR = path.join(process.cwd(), '/public/images/');
     io.on('connection', (socket) => {
       console.log(`${socket.userId}  has connected.`);
       let isOnline=true;
+      socket.on("already-In-VideoCall",(id)=>{io.to(MapManager.get(id).emit("User-Already-In-Call"))})
       socket.on("userOnline", () => handleUserOnline(socket,io,isOnline));
       socket.on("Text-message", (data) => handleIncomingMessage(socket, data,io));
-      socket.on("call-ended", (data) => {
-        io.to(MapManager.get(data.id)).emit("close-videocall",(data.message))
-      });
-
+      socket.on("call-ended", (data) => {io.to(MapManager.get(data.id)).emit("close-videocall",(data.message)) });
       socket.on("isUser-Online", (data) =>{
         if (MapManager.get(data)) {
           socket.emit("User-status",({data,myid:socket.userId}))
@@ -25,9 +23,6 @@ const UPLOAD_DIR = path.join(process.cwd(), '/public/images/');
         }
       });
      
-      socket.on("already-In-VideoCall",(id)=>{
-        io.to(MapManager.get(id).emit("User-Already-In-Call"))
-      })
       var uploader = new siofu();
       uploader.dir = UPLOAD_DIR; 
       uploader.listen(socket);
