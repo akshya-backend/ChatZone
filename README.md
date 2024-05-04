@@ -31,7 +31,7 @@ ChatZone is a real-time communication platform that allows users to chat with fr
 1. **Clone the Repository:**
 git clone https://github.com/your_username/ChatZone.git
 2. **Navigate to the Project Folder:**
-cd <folderpath>
+cd folderpath
 3. **Set Environment Variables:**
  Add necessary environment variables like database connection URI, API keys, etc in .env file
 5. **Install node modules and Dependencies:**
